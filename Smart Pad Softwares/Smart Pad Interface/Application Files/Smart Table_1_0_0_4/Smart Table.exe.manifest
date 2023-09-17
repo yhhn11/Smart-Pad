@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
+  <asmv1:assemblyIdentity name="Smart Table.exe" version="1.0.0.4" publicKeyToken="2118de942307c3f1" language="neutral" processorArchitecture="msil" type="win32" />
+  <application />
+  <entryPoint>
+    <assemblyIdentity name="Smart Table" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
+    <commandLine file="Smart Table.exe" parameters="" />
+  </entryPoint>
+  <trustInfo>
+    <security>
+      <applicationRequestMinimum>
+        <PermissionSet Unrestricted="true" ID="Custom" SameSite="site" />
+        <defaultAssemblyRequest permissionSetReference="Custom" />
+      </applicationRequestMinimum>
+      <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
+        <!--
+          Opções de Manifesto do UAC
+          Para alterar o nível de Controle de Conta de Usuário do Windows, substitua o nó
+          requestedExecutionLevel por um dos seguintes.
+
+        <requestedExecutionLevel  level="asInvoker" uiAccess="false" />
+        <requestedExecutionLevel  level="requireAdministrator" uiAccess="false" />
+        <requestedExecutionLevel  level="highestAvailable" uiAccess="false" />
+
+         Para utilizar a Virtualização de Arquivos e Registro para manter a compatibilidade com versões anteriores,
+         exclua o nó requestedExecutionLevel.
+    -->
+        <requestedExecutionLevel level="asInvoker" uiAccess="false" />
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+  <dependency>
+    <dependentOS>
+      <osVersionInfo>
+        <os majorVersion="5" minorVersion="1" buildNumber="2600" servicePackMajor="0" />
+      </osVersionInfo>
+    </dependentOS>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="preRequisite" allowDelayedBinding="true">
+      <assemblyIdentity name="Microsoft.Windows.CommonLanguageRuntime" version="4.0.30319.0" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Smart Table.exe" size="216536">
+      <assemblyIdentity name="Smart Table" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>l/+dbbqxm2FOsDkzKfrp8CamyOnb92AsMXWo/1Nnxq4=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <file name="Smart Table.exe.config" size="189">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>R+Wg8QGvQVHX8T0ta/qbhH1bXkqY0fRnS3wBV3J0bN8=</dsig:DigestValue>
+    </hash>
+  </file>
+<publisherIdentity name="CN=DESKTOP-C3NJ4LH\User" issuerKeyHash="61311198c36702847fff601ecea99a8ef37fea3e" /><Signature Id="StrongNameSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" /><DigestValue>pM0c1XnuL+nQwaKzuJ1wHWHQxy6yrio8+p0WYESGDXE=</DigestValue></Reference></SignedInfo><SignatureValue>FKyX0V745dS7fF9wcUWq+GWclEhKAxvieImJ0mxFSyCkT/yx7el00dzJ5smfB/OYEuUndxzG3IS2uw/dqgH9sfa9zxsn3MFfNIZrlbZSau/nZRm7L+SeVtWV8hqCWEr1WwN4F01pB++kApaZ9O7fZ3FqaiPo0ZeTVKcs/h9R6vw=</SignatureValue><KeyInfo Id="StrongNameKeyInfo"><KeyValue><RSAKeyValue><Modulus>8iQDqLvL+lh5y04sNoXz7igVNMLmAEam9lf0bv9VhV4oBv2F2fyn1nhtL12VjOZmIMPSKQiOHzlz1twvVV7LdttWRuD0ri/1nxCiXEabzPBBr3HHjwe3HrZmd/FvCpZJg8yUV9F864mVa5xGX56ra93pHJ/fgZaMjO9fY5aeM6k=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><msrel:RelData xmlns:msrel="http://schemas.microsoft.com/windows/rel/2005/reldata"><r:license xmlns:r="urn:mpeg:mpeg21:2003:01-REL-R-NS" xmlns:as="http://schemas.microsoft.com/windows/pki/2005/Authenticode"><r:grant><as:ManifestInformation Hash="710d864460169dfa3c2aaeb22ec7d0611d709db8b3a2c1d0e92fee79d51ccda4" Description="" Url=""><as:assemblyIdentity name="Smart Table.exe" version="1.0.0.4" publicKeyToken="2118de942307c3f1" language="neutral" processorArchitecture="msil" type="win32" /></as:ManifestInformation><as:SignedBy /><as:AuthenticodePublisher><as:X509SubjectName>CN=DESKTOP-C3NJ4LH\User</as:X509SubjectName></as:AuthenticodePublisher></r:grant><r:issuer><Signature Id="AuthenticodeSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" /><DigestValue>ZUZMyKlpLUQeN4q+iWNF0JW0Y+v8nUoUFyqAB7EzvRk=</DigestValue></Reference></SignedInfo><SignatureValue>5bC7CX3InDYCmiNGrVADPPmF51pVWmfbhWDcBA3lMuqDBnrDNa5gvBEI6DdglpvVb27kuPWtNwbD4iGm2SNyc6Nult+fqt/7VfSg3UfU3uxn9QvWvsBc0XeV6+f1bUgSaz5xlNrurGhKiwBOT45SxMgyw8IIBin/0cCnDhgXIjE=</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>8iQDqLvL+lh5y04sNoXz7igVNMLmAEam9lf0bv9VhV4oBv2F2fyn1nhtL12VjOZmIMPSKQiOHzlz1twvVV7LdttWRuD0ri/1nxCiXEabzPBBr3HHjwe3HrZmd/FvCpZJg8yUV9F864mVa5xGX56ra93pHJ/fgZaMjO9fY5aeM6k=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><X509Data><X509Certificate>MIIB6TCCAVKgAwIBAgIQYInRmEF7KKlDSI4f+zjWAjANBgkqhkiG9w0BAQsFADAzMTEwLwYDVQQDHigARABFAFMASwBUAE8AUAAtAEMAMwBOAEoANABMAEgAXABVAHMAZQByMB4XDTIzMDcyMDIyMjM0NloXDTI0MDcyMDA0MjM0NlowMzExMC8GA1UEAx4oAEQARQBTAEsAVABPAFAALQBDADMATgBKADQATABIAFwAVQBzAGUAcjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA8iQDqLvL+lh5y04sNoXz7igVNMLmAEam9lf0bv9VhV4oBv2F2fyn1nhtL12VjOZmIMPSKQiOHzlz1twvVV7LdttWRuD0ri/1nxCiXEabzPBBr3HHjwe3HrZmd/FvCpZJg8yUV9F864mVa5xGX56ra93pHJ/fgZaMjO9fY5aeM6kCAwEAATANBgkqhkiG9w0BAQsFAAOBgQCqXCRQOGSGIerQoJpXRzuhzkg/MsQA+X3dCvH9p6d2AmvrxcEU059JAjqbxQTvPV7PlDIIjlAOf/MdOitwH7vxohtM1VrA3PGGm/UD1kJ9zxPMH9iwHJx0RaftwtKEA1Z29A2v8czES5OA7GEPobQpyjwCKQdgAKvR8h0nTiUkPg==</X509Certificate></X509Data></KeyInfo></Signature></r:issuer></r:license></msrel:RelData></KeyInfo></Signature></asmv1:assembly>
