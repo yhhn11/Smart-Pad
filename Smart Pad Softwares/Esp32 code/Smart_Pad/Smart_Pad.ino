@@ -1,14 +1,16 @@
-#include <Wire.h>
+//necessary libraries
 #include <Adafruit_AS7341.h>
 #include <AccelStepper.h>
 #include <WiFi.h>
 #include <WiFiManager.h>  
 #include <HTTPClient.h>
 
+//pins for the A4988 driver
 #define dirPin 27
 #define stepPin 26
 #define enablePin 25
 
+//pin for the limit switch
 #define endStopPin 33
 
 
@@ -50,7 +52,7 @@ void setup() {
   wm.setDebugOutput(false);
   //wm.resetSettings();
   bool res;
-  res = wm.autoConnect("Smart Table","smart7923"); // password protected ap
+  res = wm.autoConnect("Smart Pad","smart7923"); // password protected ap
 
     if(WiFi.status() != WL_CONNECTED || !res) {
         Serial.print("wifinotok@");
@@ -168,7 +170,7 @@ void doReadings(){
       storeReadings[count][7] = -log10(storeReadings[count][7]/whiteValues[7]);
     }
 
-    if (WiFi.status() == WL_CONNECTED)
+    if (WiFi.status() == WL_CONNECTED && count !=  turns)
     {
     String urlfinal = "https://script.google.com/macros/s/" + ID_script + "/exec?val1=" + String(storeReadings[count][0]) + "&val2=" + String(storeReadings[count][1]) + "&val3=" + String(storeReadings[count][2]) + "&val4=" + String(storeReadings[count][3]) + "&val5=" + String(storeReadings[count][4]) + "&val6=" + String(storeReadings[count][5]) + "&val7=" + String(storeReadings[count][6]) + "&val8=" + String(storeReadings[count][7]);
     HTTPClient http;
