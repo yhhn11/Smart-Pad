@@ -3,7 +3,7 @@
 
 const char webpage[] PROGMEM = R"=====(
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -261,7 +261,12 @@ const char webpage[] PROGMEM = R"=====(
                 );
                 
                 if (!response.ok) {
-                    throw new Error('Erro na configuração');
+                    let message = 'Setup request failed';
+                    try {
+                        const err = await response.json();
+                        if (err.error) message = err.error;
+                    } catch (e) {}
+                    throw new Error(message);
                 }
 
                 measuring = true;
@@ -269,6 +274,7 @@ const char webpage[] PROGMEM = R"=====(
                 pollData();
 
             } catch (error) {
+                alert(error.message);
                 document.getElementById('startButton').disabled = false;
             }
         }
@@ -285,27 +291,23 @@ const char webpage[] PROGMEM = R"=====(
                 }
 
                 const data = await response.json();
-                
+
+                // The device went back to idle: the run is over
+                if (data.status === 'idle') {
+                    measuring = false;
+                    document.getElementById('startButton').disabled = false;
+                    return;
+                }
+
                 document.getElementById('currentSample').textContent = data.sampleNumber;
-                
+
                 const wavelengths = [415, 445, 480, 515, 555, 590, 630, 680];
                 wavelengths.forEach((wavelength, index) => {
-                    document.getElementById(`channel${wavelength}`).textContent = 
+                    document.getElementById(`channel${wavelength}`).textContent =
                         data.channels[index].toFixed(2);
                 });
-                
-                if (data.isComplete) {
-                    setTimeout(() => {
-                        if (data.sampleNumber < document.getElementById('samples').value) {
-                            setTimeout(pollData, 1000);
-                        } else {
-                            measuring = false;
-                            document.getElementById('startButton').disabled = false;
-                        }
-                    }, 10000);
-                } else {
-                    setTimeout(pollData, 1000);
-                }
+
+                setTimeout(pollData, 1000);
 
             } catch (error) {
                 measuring = false;

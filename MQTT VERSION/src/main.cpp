@@ -4,8 +4,9 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <ElegantOTA.h>
+#include "config.h"
 
-// Definições dos pinos
+// Pin definitions
 #define IN1 27
 #define IN2 25
 #define IN3 33
@@ -24,32 +25,32 @@
 #define NUM_CHANNELS 8
 #define READINGS_PER_SAMPLE 20
 
-char ssid[] = "TP-Link_7201";
-char password[] = "83345173";
+char ssid[] = WIFI_SSID;
+char password[] = WIFI_PASSWORD;
 
-const char* mqtt_server = "192.168.0.110";
-const char* mqttUser = "yugo";
-const char* mqttPassword = "1234";
-const char* mqtt_id = "Smart_Pad01";
-const int   mqtt_port = 1883;
-const char  mqttTopic[] = "Smart/Pad01";
-const char  mqttTopicSetup[] = "Smart/Pad01/Setup";
-const char  mqttTopicDebug[] = "Smart/Pad01/Debug";
-const char  mqttTopicNotifications[] = "Smart/Pad01/Notifications";
+const char* mqtt_server = MQTT_SERVER;
+const char* mqttUser = MQTT_USER;
+const char* mqttPassword = MQTT_PASSWORD;
+const char* mqtt_id = MQTT_CLIENT_ID;
+const int   mqtt_port = MQTT_PORT;
+const char  mqttTopic[] = MQTT_TOPIC_DATA;
+const char  mqttTopicSetup[] = MQTT_TOPIC_SETUP;
+const char  mqttTopicDebug[] = MQTT_TOPIC_DEBUG;
+const char  mqttTopicNotifications[] = MQTT_TOPIC_NOTIFICATIONS;
 
 WiFiClient wifiClient;
 PubSubClient client(wifiClient);
 
-// Sistema OTA para Update web
+// OTA system for web-based firmware updates
 AsyncWebServer server(80);
-const char* userOTA = "smartufu";
-const char* userPassWordOTA = "smartufu";
+const char* userOTA = OTA_USER;
+const char* userPassWordOTA = OTA_PASSWORD;
 
-// Objetos globais
+// Global objects
 AccelStepper stepper(AccelStepper::FULL4WIRE, IN1, IN3, IN2, IN4);
 Adafruit_AS7341 as7341;
 
-// Estruturas de dados para configuração das medidas
+// Data structure holding the measurement configuration
 struct MeasurementConfig {
     uint16_t gain = 1;
     uint16_t current = 100;
@@ -58,7 +59,7 @@ struct MeasurementConfig {
     bool isValid = false;
 };
 
-// Estruturas de dados para armazenar os dados das medidas
+// Data structure holding the measurement results
 struct MeasurementData {
     float channels[NUM_CHANNELS];
     int currentSample = 0;
@@ -76,7 +77,7 @@ void disableStepper();
 void resetPosition();
 void moveToNextPosition(int currentSample);
 bool configureSensor();
-float filtroMediaMovel(uint16_t amostras[], int tamanho);
+float trimmedMeanFilter(uint16_t samples[], int size);
 void performSingleMeasurement();
 void mqtt_callback(char* topic, byte* payload, unsigned int length);
 
@@ -91,7 +92,7 @@ void setup() {
         if (attemptsWifi > 20) {
             ESP.restart();
         }
-    } 
+    }
 
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(200, "text/plain", "Smart Pad 01");
@@ -111,7 +112,7 @@ void setup() {
     client.subscribe(mqttTopicSetup);
 
     while(!as7341.begin()) {
-        client.publish(mqttTopicNotifications, "Falha ao inicializar sensor AS7341, verifique as conexões");
+        client.publish(mqttTopicNotifications, "AS7341 sensor initialization failed, check the wiring");
     }
     as7341.setATIME(100);
     as7341.setASTEP(999);
@@ -129,11 +130,11 @@ void setup() {
 
     disableStepper();
 
-    String msg_str_ip;
-    msg_str_ip =  "IP Smart_Pad_01 : " + WiFi.localIP().toString();
-    client.publish(mqttTopicDebug, msg_str_ip.c_str());
+    String ipMessage;
+    ipMessage =  "IP Smart_Pad_01 : " + WiFi.localIP().toString();
+    client.publish(mqttTopicDebug, ipMessage.c_str());
 
-    client.publish(mqttTopicNotifications, "Smart Pad 01 inicializado e pronto");
+    client.publish(mqttTopicNotifications, "Smart Pad 01 initialized and ready");
 }
 
 void loop() {
@@ -153,7 +154,7 @@ void loop() {
         }
         if (measurementData.currentSample <= config.numSamples) {
             performSingleMeasurement();
-            // Monta string para publicar resultado
+            // Build the result string that gets published
             String result = String(measurementData.currentSample);
             for (int i = 0; i < NUM_CHANNELS; i++) {
                 result += "," + String(measurementData.channels[i], 3);
@@ -167,7 +168,7 @@ void loop() {
             measurementData.positionReset = false;
             as7341.enableLED(false);
             disableStepper();
-            client.publish(mqttTopicNotifications, "Medidas finalizadas");
+            client.publish(mqttTopicNotifications, "Measurements finished");
         }
     }
 }
@@ -188,7 +189,7 @@ void disableStepper() {
 
 void resetPosition() {
     enableStepper();
-    stepper.setSpeed(-75); 
+    stepper.setSpeed(-75);
 
     while (digitalRead(PHOTOINTERRUPTER_PIN) == LOW) {
         stepper.runSpeed();
@@ -197,26 +198,26 @@ void resetPosition() {
     stepper.stop();
     stepper.setCurrentPosition(0);
     measurementData.positionReset = true;
-    client.publish(mqttTopicDebug, "Home encontrado e posição zerada.");
+    client.publish(mqttTopicDebug, "Home position found, step counter reset.");
 }
 
 void moveToNextPosition(int currentSample) {
-    int passos;
+    int steps;
 
     if(currentSample == 0){
-        passos = - STEPS_TO_FIRST_CEL;
+        steps = - STEPS_TO_FIRST_CEL;
     }
     else if(currentSample == 1){
-        passos = STEPS_TO_FIRST_SAMPLE;
+        steps = STEPS_TO_FIRST_SAMPLE;
     }
-    else if(currentSample % 3 == 0 && currentSample < MAX_SAMPLES + 1){ 
-        passos = STEPS_NEXT_CEL + STEPS_CORRECTION;
+    else if(currentSample % 3 == 0 && currentSample < MAX_SAMPLES + 1){
+        steps = STEPS_NEXT_CEL + STEPS_CORRECTION;
     }
     else{
-        passos = STEPS_NEXT_CEL;
+        steps = STEPS_NEXT_CEL;
     }
 
-    stepper.move(passos);
+    stepper.move(steps);
     while (stepper.distanceToGo() != 0) {
         stepper.run();
     }
@@ -242,30 +243,30 @@ bool configureSensor() {
     return true;
 }
 
-float filtroMediaMovel(uint16_t amostras[], int tamanho) {
-    // Ordena o array de amostras em ordem crescente
-    for (int i = 0; i < tamanho - 1; i++) {
-        for (int j = i + 1; j < tamanho; j++) {
-            if (amostras[j] < amostras[i]) {
-                uint16_t temp = amostras[i];
-                amostras[i] = amostras[j];
-                amostras[j] = temp;
+float trimmedMeanFilter(uint16_t samples[], int size) {
+    // Sort the sample array in ascending order
+    for (int i = 0; i < size - 1; i++) {
+        for (int j = i + 1; j < size; j++) {
+            if (samples[j] < samples[i]) {
+                uint16_t temp = samples[i];
+                samples[i] = samples[j];
+                samples[j] = temp;
             }
         }
     }
-    // Calcula o índice do primeiro e último quartil (25%)
-    int primeiroQuartil = tamanho / 4;
-    int ultimoQuartil = primeiroQuartil * 3;
+    // Index of the first and of the last quartile (25%)
+    int firstQuartile = size / 4;
+    int lastQuartile = firstQuartile * 3;
 
-    // Calcula a soma das amostras do segundo e terceiro quartil (50%)
-    float soma = 0.0;
-    int contagem = 0;
-    for (int i = primeiroQuartil; i < ultimoQuartil; i++) {
-        soma += amostras[i];
-        contagem++;
+    // Sum the samples of the second and third quartiles (the middle 50%)
+    float sum = 0.0;
+    int count = 0;
+    for (int i = firstQuartile; i < lastQuartile; i++) {
+        sum += samples[i];
+        count++;
     }
-    // Calcula e retorna a média das amostras do segundo e terceiro quartil
-    return soma / contagem;
+    // Return the mean of the second and third quartiles
+    return sum / count;
 }
 
 void performSingleMeasurement() {
@@ -302,7 +303,7 @@ void performSingleMeasurement() {
         for (int i = 0; i < READINGS_PER_SAMPLE; i++) {
             channelReadings[i] = readings[i][channel];
         }
-        averages[channel] = filtroMediaMovel(channelReadings, READINGS_PER_SAMPLE);
+        averages[channel] = trimmedMeanFilter(channelReadings, READINGS_PER_SAMPLE);
     }
 
     if (config.sampleType == 0) { // Raw
@@ -334,31 +335,31 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
     msg_mqtt[length] = '\0';
 
     if(strcmp(topic, mqttTopicSetup) == 0){
-        int tipo = 0, amostras = 0, ganho = 0, corrente = 0;
-        int numlidos = sscanf(msg_mqtt, "%d,%d,%d,%d", &tipo, &amostras, &ganho, &corrente);
-        if(numlidos == 4){
-            if(amostras <= 0 || amostras > MAX_SAMPLES){
-                client.publish(mqttTopicDebug, "Numero de amostras invalido");
+        int type = 0, samples = 0, gain = 0, current = 0;
+        int parsedFields = sscanf(msg_mqtt, "%d,%d,%d,%d", &type, &samples, &gain, &current);
+        if(parsedFields == 4){
+            if(samples <= 0 || samples > MAX_SAMPLES){
+                client.publish(mqttTopicDebug, "Invalid number of samples");
                 return;
             }
-            if(tipo > 1 || tipo < 0){
-                client.publish(mqttTopicDebug, "Tipo de amostra invalido");
+            if(type > 1 || type < 0){
+                client.publish(mqttTopicDebug, "Invalid sample type");
                 return;
             }
-            if(corrente < MIN_LED_CURRENT || corrente > MAX_LED_CURRENT){
-                client.publish(mqttTopicDebug, "Corrente invalida");
+            if(current < MIN_LED_CURRENT || current > MAX_LED_CURRENT){
+                client.publish(mqttTopicDebug, "Invalid LED current");
                 return;
             }
-            if(ganho < MIN_GAIN || ganho > MAX_GAIN){
-                client.publish(mqttTopicDebug, "Ganho invalido");
+            if(gain < MIN_GAIN || gain > MAX_GAIN){
+                client.publish(mqttTopicDebug, "Invalid gain");
                 return;
             }
-            config.gain = ganho;
-            config.current = corrente;
-            config.numSamples = amostras;
-            config.sampleType = tipo;
+            config.gain = gain;
+            config.current = current;
+            config.numSamples = samples;
+            config.sampleType = type;
             if (!configureSensor()) {
-                client.publish(mqttTopicDebug, "Falha ao configurar sensor");
+                client.publish(mqttTopicDebug, "Sensor configuration failed");
                 return;
             }
             measurementData.currentSample = 0;
@@ -366,9 +367,9 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
             measurementData.inProgress = true;
             measurementData.positionReset = false;
             config.isValid = true;
-            client.publish(mqttTopicNotifications, "Setup OK, iniciando medição");
+            client.publish(mqttTopicNotifications, "Setup OK, starting measurement");
         } else {
-            client.publish(mqttTopicNotifications, "Setup não reconhecido!");
+            client.publish(mqttTopicNotifications, "Setup message not recognized!");
         }
     }
 }
